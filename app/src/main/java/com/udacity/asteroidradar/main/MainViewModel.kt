@@ -7,7 +7,9 @@ import android.os.Bundle
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.api.AsteroidApi
+import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import timber.log.Timber
 import java.lang.Exception
 import java.lang.IllegalArgumentException
@@ -18,21 +20,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
 
-    val asteriod_test = MutableLiveData<String>()
-
     private var metadata: Bundle? = null
 
     init {
         metadata = getMetaData(application.applicationContext)
         val apikey: String = metadata?.get("nasa_api_key").toString() // the api key
+        getAsteroids(apikey)
     }
 
     private fun getAsteroids(apiKey: String) {
         viewModelScope.launch {
             try {
                 Timber.i("Timber. Contacting the API")
-                asteriod_test.value =
-                    AsteroidApi.asteroids.getAsteroids("2022-05-11", "2022-05-18", apiKey)
+                val apiResult =
+                    AsteroidApi.asteroids.getAsteroids("2022-05-12", "2022-05-19", apiKey)
+                _asteroids.value = parseAsteroidsJsonResult(JSONObject(apiResult))
             } catch (e: Exception) {
                 Timber.i("Timber. Error with API: $e")
             }
@@ -52,6 +54,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if(modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
                 return MainViewModel(app) as T
             }
             throw IllegalArgumentException("unable to construct MainViewModel")
