@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.api.AsteroidApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.launch
@@ -28,15 +28,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         getAsteroids(apikey)
     }
 
+    //TODO: Have an error handling variable
+
+    //TODO: Have a loading variable
+
     private fun getAsteroids(apiKey: String) {
         viewModelScope.launch {
             try {
                 Timber.i("Timber. Contacting the API")
+                //TODO: generate the dates dynamically
                 val apiResult =
-                    AsteroidApi.asteroids.getAsteroids("2022-05-12", "2022-05-19", apiKey)
+                    AsteroidApi.asteroids.getAsteroids("2022-05-13", "2022-05-20", apiKey)
                 _asteroids.value = parseAsteroidsJsonResult(JSONObject(apiResult))
             } catch (e: Exception) {
                 Timber.i("Timber. Error with API: $e")
+                _asteroids.value = listOf()
             }
         }
     }

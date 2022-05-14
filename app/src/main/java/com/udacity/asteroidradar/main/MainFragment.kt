@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 import timber.log.Timber
@@ -14,7 +15,10 @@ class MainFragment : Fragment() {
         val activity = requireNotNull(this.activity) {
             "You can only access the viewModel after onViewCreated()"
         }
-        ViewModelProvider(this, MainViewModel.Factory(activity.application))[MainViewModel::class.java]
+        ViewModelProvider(
+            this,
+            MainViewModel.Factory(activity.application)
+        )[MainViewModel::class.java]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -27,12 +31,22 @@ class MainFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
+
+        val adapter = AsteroidListAdapter(AsteroidClickListener { asteroid ->
+            Snackbar.make(binding.root, "${asteroid.codename} was called.", Snackbar.LENGTH_SHORT)
+                .show()
+        })
+
+        // set the adapter for the RecyclerView
+        binding.asteroidRecycler.adapter = adapter
 
         setHasOptionsMenu(true)
 
