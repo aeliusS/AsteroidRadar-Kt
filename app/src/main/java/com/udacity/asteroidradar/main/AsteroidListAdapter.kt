@@ -9,14 +9,14 @@ import com.udacity.asteroidradar.databinding.ListAsteroidBinding
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.main.AsteroidListAdapter.AsteroidListViewHolder
 
-class AsteroidListAdapter(val clickListener: AsteroidClickListener): ListAdapter<Asteroid, AsteroidListViewHolder>(DiffCallBack) {
+class AsteroidListAdapter(private val clickListener: AsteroidClickListener): ListAdapter<Asteroid, AsteroidListViewHolder>(DiffCallBack) {
     companion object DiffCallBack: DiffUtil.ItemCallback<Asteroid>() {
         override fun areItemsTheSame(oldItem: Asteroid, newItem: Asteroid): Boolean {
-            return oldItem === newItem
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Asteroid, newItem: Asteroid): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem == newItem
         }
     }
 

@@ -5,20 +5,17 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.domain.Asteroid
-import com.udacity.asteroidradar.api.AsteroidApi
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import timber.log.Timber
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
+    private val database = getDatabase(application)
+    private val asteroidsRepository = AsteroidsRepository(database)
 
     private var metadata: Bundle? = null
 
@@ -28,6 +25,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         getAsteroids(apikey)
     }
 
+    val asteroids = asteroidsRepository.asteroids
+
     //TODO: Have an error handling variable
 
     //TODO: Have a loading variable
@@ -35,14 +34,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun getAsteroids(apiKey: String) {
         viewModelScope.launch {
             try {
-                Timber.i("Timber. Contacting the API")
-                //TODO: generate the dates dynamically
-                val apiResult =
-                    AsteroidApi.asteroids.getAsteroids("2022-05-13", "2022-05-20", apiKey)
-                _asteroids.value = parseAsteroidsJsonResult(JSONObject(apiResult))
+                asteroidsRepository.refreshAsteroids(apiKey)
             } catch (e: Exception) {
-                Timber.i("Timber. Error with API: $e")
-                _asteroids.value = listOf()
+                Timber.i("Timber. Error with refreshing cache: $e")
+                // _asteroids.value = listOf()
             }
         }
     }
@@ -59,11 +54,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * */
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if(modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return MainViewModel(app) as T
             }
             throw IllegalArgumentException("unable to construct MainViewModel")
         }
     }
+
+    data class DateRange(val startDate: String, val endDate: String)
 }
