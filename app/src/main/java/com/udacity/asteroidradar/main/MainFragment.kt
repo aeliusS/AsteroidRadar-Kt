@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
-import timber.log.Timber
 
 class MainFragment : Fragment() {
 
@@ -21,16 +21,6 @@ class MainFragment : Fragment() {
         )[MainViewModel::class.java]
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.asteroids.observe(viewLifecycleOwner) { asteroids ->
-            for (asteroid in asteroids) {
-                Timber.i("Timber. First asteroid: ${asteroid.codename}")
-                break
-            }
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,12 +31,24 @@ class MainFragment : Fragment() {
         binding.viewModel = viewModel
 
         val adapter = AsteroidListAdapter(AsteroidClickListener { asteroid ->
-            Snackbar.make(binding.root, "${asteroid.codename} was called.", Snackbar.LENGTH_SHORT)
-                .show()
+            this.findNavController().navigate(
+                MainFragmentDirections.actionShowDetail(asteroid)
+            )
         })
 
         // set the adapter for the RecyclerView
         binding.asteroidRecycler.adapter = adapter
+
+        viewModel.repositoryError.observe(viewLifecycleOwner) { error ->
+            if (error) {
+                Snackbar.make(binding.root, "Could not refresh data", Snackbar.LENGTH_SHORT)
+                    .setAction(R.string.refresh_data) {
+                        viewModel.refreshData()
+                    }
+                    .show()
+                viewModel.finishedDisplayingApiError()
+            }
+        }
 
         setHasOptionsMenu(true)
 

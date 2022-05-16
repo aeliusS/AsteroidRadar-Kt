@@ -65,8 +65,11 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation 'androidx.room:room-runtime:2.4.2'
-    kapt 'androidx.room:room-compiler:2.4.2'
+    implementation "androidx.room:room-runtime:$version_room"
+    kapt "androidx.room:room-compiler:$version_room"
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:$version_room"
 
     // work manager
     implementation "androidx.work:work-runtime-ktx:$work_version"

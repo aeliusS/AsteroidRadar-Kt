@@ -17,27 +17,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val database = getDatabase(application)
     private val asteroidsRepository = AsteroidsRepository(database)
 
-    private var metadata: Bundle? = null
+    private var metadata = getMetaData(application.applicationContext)
+    private val apiKey: String = metadata?.get("nasa_api_key").toString() // the api key
+
+    //TODO: Have an error handling variable
+    private var _repositoryError = MutableLiveData<Boolean>()
+    val repositoryError: LiveData<Boolean>
+        get() = _repositoryError
 
     init {
-        metadata = getMetaData(application.applicationContext)
-        val apikey: String = metadata?.get("nasa_api_key").toString() // the api key
-        getAsteroids(apikey)
+        _repositoryError.value = false
+        getAsteroids()
     }
 
     val asteroids = asteroidsRepository.asteroids
 
-    //TODO: Have an error handling variable
-
     //TODO: Have a loading variable
+    fun refreshData() {
+        getAsteroids()
+    }
 
-    private fun getAsteroids(apiKey: String) {
+    private fun getAsteroids() {
         viewModelScope.launch {
             try {
+                asteroidsRepository.removeOldAsteroids()
                 asteroidsRepository.refreshAsteroids(apiKey)
+                Timber.i("Timber. Refreshed cache")
             } catch (e: Exception) {
                 Timber.i("Timber. Error with refreshing cache: $e")
-                // _asteroids.value = listOf()
+                _repositoryError.value = true
             }
         }
     }
@@ -47,6 +55,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             context.packageName,
             PackageManager.GET_META_DATA
         ).metaData
+    }
+
+    fun finishedDisplayingApiError() {
+        _repositoryError.value = false
     }
 
     /**
