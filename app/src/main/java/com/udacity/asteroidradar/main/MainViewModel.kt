@@ -12,6 +12,8 @@ import timber.log.Timber
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 
+enum class AsteroidApiStatus { LOADING, ERROR, DONE }
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = getDatabase(application)
@@ -20,36 +22,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var metadata = getMetaData(application.applicationContext)
     private val apiKey: String = metadata?.get("nasa_api_key").toString() // the api key
 
-    //TODO: Have an error handling variable
-    private var _repositoryError = MutableLiveData<Boolean>()
-    val repositoryError: LiveData<Boolean>
-        get() = _repositoryError
+    // used to show snack bar notifications
+    private val _asteroidApiStatus = MutableLiveData<AsteroidApiStatus>()
+    val asteroidApiStatus: LiveData<AsteroidApiStatus>
+        get() = _asteroidApiStatus
 
     init {
-        _repositoryError.value = false
         getAsteroids()
     }
 
     val asteroids = asteroidsRepository.asteroids
 
-    //TODO: Have a loading variable
     fun refreshData() {
         getAsteroids()
     }
 
     private fun getAsteroids() {
         viewModelScope.launch {
+            _asteroidApiStatus.value = AsteroidApiStatus.LOADING
             try {
-                asteroidsRepository.removeOldAsteroids()
                 asteroidsRepository.refreshAsteroids(apiKey)
-                Timber.i("Timber. Refreshed cache")
+                _asteroidApiStatus.value = AsteroidApiStatus.DONE
+                Timber.d("Timber. Refreshed cache")
             } catch (e: Exception) {
-                Timber.i("Timber. Error with refreshing cache: $e")
-                _repositoryError.value = true
+                _asteroidApiStatus.value = AsteroidApiStatus.ERROR
+                Timber.w("Timber. Error with refreshing cache: $e")
             }
         }
     }
 
+    /**
+     * Helper function necessary to get API key
+     * */
     private fun getMetaData(context: Context): Bundle? {
         return context.packageManager.getApplicationInfo(
             context.packageName,
@@ -57,8 +61,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         ).metaData
     }
 
-    fun finishedDisplayingApiError() {
-        _repositoryError.value = false
+    fun finishedDisplayingApiMessage() {
+        _asteroidApiStatus.value = AsteroidApiStatus.DONE
     }
 
     /**
@@ -73,6 +77,4 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             throw IllegalArgumentException("unable to construct MainViewModel")
         }
     }
-
-    data class DateRange(val startDate: String, val endDate: String)
 }

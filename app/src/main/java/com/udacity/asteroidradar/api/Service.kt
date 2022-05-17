@@ -23,9 +23,9 @@ interface AsteroidApiService {
 object AsteroidApi {
     // configure the http client for a longer timeout
     private val client = OkHttpClient.Builder()
-        .connectTimeout(100, TimeUnit.SECONDS)
-        .readTimeout(100, TimeUnit.SECONDS)
-        .writeTimeout(100, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
     private val retrofit = Retrofit.Builder()
         .baseUrl(Constants.BASE_URL)

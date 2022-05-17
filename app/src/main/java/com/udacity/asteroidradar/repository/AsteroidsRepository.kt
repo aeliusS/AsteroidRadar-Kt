@@ -34,6 +34,7 @@ class AsteroidsRepository(
      * Update the database (cache)
      * */
     suspend fun refreshAsteroids(apiKey: String) {
+        removeOldAsteroids()
         withContext(defaultDispatcher) {
             val (startDate, endDate) = getDateRangeFormatted()
             Timber.i("Timber. Date range is $startDate to $endDate")
@@ -61,9 +62,9 @@ class AsteroidsRepository(
     /**
      * Helper functions
      * */
-    private fun getDateRangeFormatted(): MainViewModel.DateRange {
+    private fun getDateRangeFormatted(): DateRange {
         val calendar = Calendar.getInstance()
-        return MainViewModel.DateRange(
+        return DateRange(
             startDate = formatDate(calendar),
             endDate = formatDate(calendar, Constants.DEFAULT_END_DATE_DAYS)
         )
@@ -78,4 +79,6 @@ class AsteroidsRepository(
         )
         return dateFormat.format(currentTime)
     }
+
+    data class DateRange(val startDate: String, val endDate: String)
 }
