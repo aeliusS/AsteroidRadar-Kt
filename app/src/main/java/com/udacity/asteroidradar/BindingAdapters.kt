@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.main.AsteroidListAdapter
 
@@ -59,4 +60,17 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
 @BindingAdapter("goneIfNotNull")
 fun goneIfNotNull(view: View, it: Any?) {
     view.visibility = if (it != null) View.GONE else View.VISIBLE
+}
+
+/** Adapter used to display images from URL using Picasso **/
+@BindingAdapter("imageUrl", "isImage")
+fun bindImage(imageView: ImageView, imageUrl: String?, isImage: Boolean?) {
+    if (isImage == true) {
+        Picasso.get()
+            .load(imageUrl)
+            .fit()
+            .placeholder(R.drawable.placeholder_picture_of_day)
+            .error(R.drawable.placeholder_picture_of_day)
+            .into(imageView)
+    }
 }

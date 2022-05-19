@@ -29,9 +29,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         getAsteroids()
+        getPictureOfDay()
     }
 
     val asteroids = asteroidsRepository.asteroids
+
+    val pictureOfDay = asteroidsRepository.pictureOfDay
 
     fun refreshData() {
         getAsteroids()
@@ -51,6 +54,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun getPictureOfDay() {
+        viewModelScope.launch {
+            try {
+                asteroidsRepository.refreshPictureOfDay(apiKey)
+                Timber.d("Timber. Updated picture")
+            } catch (e: Exception) {
+                Timber.w("Timber. Error getting picture of day")
+            }
+        }
+    }
+
     /**
      * Helper function necessary to get API key
      * */
@@ -61,7 +75,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         ).metaData
     }
 
-    fun finishedDisplayingApiMessage() {
+    fun finishedDisplayingApiErrorMessage() {
         _asteroidApiStatus.value = AsteroidApiStatus.DONE
     }
 

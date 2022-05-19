@@ -23,9 +23,23 @@ interface AsteroidDao {
     @Query("DELETE FROM DatabaseAsteroid WHERE closeApproachDate < :targetDate")
     suspend fun deleteOldAsteroids(targetDate: String)
 
+    /** Section for picture of day **/
+    @Query("SELECT * FROM daily_picture_table ORDER BY pictureId DESC LIMIT 1")
+    fun getPictureOfDay(): LiveData<DatabasePicture?>
+
+    @Insert
+    fun insertPictureOfDay(picture: DatabasePicture)
+
+    @Query("DELETE FROM daily_picture_table")
+    suspend fun clearPictureOfDay()
+
 }
 
-@Database(entities = [DatabaseAsteroid::class], version = 1, exportSchema = false)
+@Database(
+    entities = [DatabaseAsteroid::class, DatabasePicture::class],
+    version = 2,
+    exportSchema = false
+)
 abstract class AsteroidsDatabase : RoomDatabase() {
     abstract val asteroidDao: AsteroidDao
 }
@@ -38,7 +52,9 @@ fun getDatabase(context: Context): AsteroidsDatabase {
                 context.applicationContext,
                 AsteroidsDatabase::class.java,
                 "asteroids"
-            ).build()
+            )
+                .fallbackToDestructiveMigration()
+                .build()
         }
         Timber.d("Timber. AsteroidsDatabase initialized")
     }

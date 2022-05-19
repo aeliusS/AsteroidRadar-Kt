@@ -10,7 +10,7 @@ import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.database.asDomainModel
 import com.udacity.asteroidradar.domain.Asteroid
-import com.udacity.asteroidradar.main.MainViewModel
+import com.udacity.asteroidradar.domain.PictureOfDay
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,8 +30,13 @@ class AsteroidsRepository(
             it.asDomainModel()
         }
 
+    val pictureOfDay: LiveData<PictureOfDay?> =
+        Transformations.map(database.asteroidDao.getPictureOfDay()) {
+            it?.asDomainModel()
+        }
+
     /**
-     * Update the database (cache)
+     * Update the database (cache) for asteroids
      * */
     suspend fun refreshAsteroids(apiKey: String) {
         removeOldAsteroids()
@@ -49,13 +54,24 @@ class AsteroidsRepository(
     /**
      * Remove asteroids that already passed
      * */
-    suspend fun removeOldAsteroids() {
+    private suspend fun removeOldAsteroids() {
         // get current date
         val calendar = Calendar.getInstance()
         val targetDate = formatDate(calendar)
 
         withContext(defaultDispatcher) {
             database.asteroidDao.deleteOldAsteroids(targetDate)
+        }
+    }
+
+    /**
+     * Update the database (cache) for picture of day
+     * */
+    suspend fun refreshPictureOfDay(apiKey: String) {
+        withContext(defaultDispatcher) {
+            val networkPictureOfDay = AsteroidApi.asteroids.getPictureOfTheDay(apiKey)
+            database.asteroidDao.clearPictureOfDay()
+            database.asteroidDao.insertPictureOfDay(networkPictureOfDay.asDatabaseModel())
         }
     }
 

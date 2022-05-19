@@ -2,7 +2,6 @@ package com.udacity.asteroidradar.main
 
 import android.os.Bundle
 import android.view.*
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -28,7 +27,7 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainBinding.inflate(inflater)
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
 
         binding.viewModel = viewModel
 
@@ -58,12 +57,11 @@ class MainFragment : Fragment() {
                         viewModel.refreshData()
                     }
                     .show()
-                viewModel.finishedDisplayingApiMessage()
+                viewModel.finishedDisplayingApiErrorMessage()
             }
             AsteroidApiStatus.LOADING -> {
                 Snackbar.make(binding.root, R.string.asteroid_api_loading_message, Snackbar.LENGTH_SHORT)
                     .show()
-                viewModel.finishedDisplayingApiMessage()
             }
             else -> {}
         }

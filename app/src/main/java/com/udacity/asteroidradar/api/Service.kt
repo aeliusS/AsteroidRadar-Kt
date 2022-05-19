@@ -1,8 +1,11 @@
 package com.udacity.asteroidradar.api
 
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.Constants
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -18,6 +21,12 @@ interface AsteroidApiService {
         @Query("end_date") endDate: String,
         @Query("api_key") apiKey: String
     ): String
+
+    @GET("planetary/apod")
+    suspend fun getPictureOfTheDay(
+        @Query("api_key") apiKey: String,
+        @Query("thumbs") thumbnail: Boolean = false
+    ): NetworkPictureOfDay
 }
 
 object AsteroidApi {
@@ -27,10 +36,14 @@ object AsteroidApi {
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
+    private val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
     private val retrofit = Retrofit.Builder()
         .baseUrl(Constants.BASE_URL)
         .client(client)
         .addConverterFactory(ScalarsConverterFactory.create())
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
 
     val asteroids: AsteroidApiService by lazy {
