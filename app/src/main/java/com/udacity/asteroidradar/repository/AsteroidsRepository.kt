@@ -66,8 +66,14 @@ class AsteroidsRepository(
     suspend fun refreshPictureOfDay(apiKey: String) {
         withContext(defaultDispatcher) {
             val networkPictureOfDay = AsteroidApi.asteroids.getPictureOfTheDay(apiKey)
-            asteroidDao.clearPictureOfDay()
             asteroidDao.insertPictureOfDay(networkPictureOfDay.asDatabaseModel())
+
+            // clear up the older picture
+            asteroidDao.getPictureOfDayNotLive()?.pictureId?.let {
+                asteroidDao.clearOlderPictureOfDay(
+                    it
+                )
+            }
         }
     }
 

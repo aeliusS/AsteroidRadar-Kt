@@ -6,28 +6,24 @@ import androidx.room.PrimaryKey
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.domain.PictureOfDay
 
-@Entity
+@Entity(tableName = "asteroid_table")
 data class DatabaseAsteroid constructor(
-    @PrimaryKey
-    val id: Long,
-    val codename: String,
-    val closeApproachDate: String,
-    val absoluteMagnitude: Double,
-    val estimatedDiameter: Double,
-    val relativeVelocity: Double,
-    val distanceFromEarth: Double,
-    val isPotentiallyHazardous: Boolean
+    @PrimaryKey val id: Long,
+    @ColumnInfo(name = "code_name") val codename: String,
+    @ColumnInfo(name = "close_approach_date") val closeApproachDate: String,
+    @ColumnInfo(name = "absolute_magnitude") val absoluteMagnitude: Double,
+    @ColumnInfo(name = "estimated_diameter") val estimatedDiameter: Double,
+    @ColumnInfo(name = "relative_velocity") val relativeVelocity: Double,
+    @ColumnInfo(name = "distance_from_earth") val distanceFromEarth: Double,
+    @ColumnInfo(name = "is_potentially_hazardous") val isPotentiallyHazardous: Boolean
 )
 
 @Entity(tableName = "daily_picture_table")
 data class DatabasePicture(
-    @PrimaryKey(autoGenerate = true)
-    var pictureId: Long = 0L,
-
-    @ColumnInfo(name = "media_type")
-    var mediaType: String,
-    var title: String,
-    var url: String
+    @PrimaryKey(autoGenerate = true) val pictureId: Long = 0L,
+    @ColumnInfo(name = "media_type") val mediaType: String,
+    val title: String,
+    val url: String
 )
 
 fun List<DatabaseAsteroid>.asDomainModel(): List<Asteroid> {

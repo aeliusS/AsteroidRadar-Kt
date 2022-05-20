@@ -4,10 +4,12 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.main.AsteroidListAdapter
+import timber.log.Timber
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
@@ -58,8 +60,8 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
  * Binding adapter used to hide the spinner when data is available
  * */
 @BindingAdapter("goneIfNotNull")
-fun goneIfNotNull(view: View, it: Any?) {
-    view.visibility = if (it != null) View.GONE else View.VISIBLE
+fun goneIfNotNull(view: View, data: List<Asteroid>?) {
+    view.visibility = if (!data.isNullOrEmpty()) View.GONE else View.VISIBLE
 }
 
 /** Adapter used to display images from URL using Picasso **/
@@ -69,7 +71,7 @@ fun bindImage(imageView: ImageView, imageUrl: String?, isImage: Boolean?) {
         Picasso.get()
             .load(imageUrl)
             .fit()
-            .placeholder(R.drawable.placeholder_picture_of_day)
+            .placeholder(R.drawable.loading_animation)
             .error(R.drawable.placeholder_picture_of_day)
             .into(imageView)
     }

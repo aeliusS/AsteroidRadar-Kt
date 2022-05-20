@@ -11,11 +11,11 @@ import timber.log.Timber
 interface AsteroidDao {
     // if returning a basic List, room library will block on the main thread
     // if using live data, the UI can watch for changes and room will update on a background thread
-    @Query("SELECT * FROM DatabaseAsteroid " +
-            "WHERE closeApproachDate >= :targetDate ORDER BY closeApproachDate")
+    @Query("SELECT * FROM asteroid_table " +
+            "WHERE close_approach_date >= :targetDate ORDER BY close_approach_date")
     fun getAsteroidsAll(targetDate: String): Flow<List<DatabaseAsteroid>>
 
-    @Query("SELECT * FROM DatabaseAsteroid WHERE closeApproachDate = :targetDate")
+    @Query("SELECT * FROM asteroid_table WHERE close_approach_date = :targetDate")
     fun getAsteroidsByDate(targetDate: String): Flow<List<DatabaseAsteroid>>
 
     // vararg allows us to pass a variable number of DatabaseVideo objects to be
@@ -25,24 +25,27 @@ interface AsteroidDao {
     fun insertAll(vararg asteroids: DatabaseAsteroid)
 
     // remove asteroids that already passed
-    @Query("DELETE FROM DatabaseAsteroid WHERE closeApproachDate < :targetDate")
+    @Query("DELETE FROM asteroid_table WHERE close_approach_date < :targetDate")
     suspend fun deleteOldAsteroids(targetDate: String)
 
     /** Section for picture of day **/
     @Query("SELECT * FROM daily_picture_table ORDER BY pictureId DESC LIMIT 1")
     fun getPictureOfDay(): LiveData<DatabasePicture?>
 
+    @Query("SELECT * FROM daily_picture_table ORDER BY pictureId DESC LIMIT 1")
+    fun getPictureOfDayNotLive(): DatabasePicture?
+
     @Insert
     fun insertPictureOfDay(picture: DatabasePicture)
 
-    @Query("DELETE FROM daily_picture_table")
-    suspend fun clearPictureOfDay()
+    @Query("DELETE FROM daily_picture_table WHERE pictureId != :pictureId")
+    suspend fun clearOlderPictureOfDay(pictureId: Long)
 
 }
 
 @Database(
     entities = [DatabaseAsteroid::class, DatabasePicture::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AsteroidsDatabase : RoomDatabase() {

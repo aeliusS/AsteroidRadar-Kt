@@ -23,10 +23,7 @@ interface AsteroidApiService {
     ): String
 
     @GET("planetary/apod")
-    suspend fun getPictureOfTheDay(
-        @Query("api_key") apiKey: String,
-        @Query("thumbs") thumbnail: Boolean = false
-    ): NetworkPictureOfDay
+    suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String): NetworkPictureOfDay
 }
 
 object AsteroidApi {
