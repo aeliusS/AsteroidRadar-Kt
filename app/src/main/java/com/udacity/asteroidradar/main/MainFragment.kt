@@ -52,7 +52,7 @@ class MainFragment : Fragment() {
     private fun handleAsteroidApiStatus(status: AsteroidApiStatus) {
         when (status) {
             AsteroidApiStatus.ERROR -> {
-                Snackbar.make(binding.root, R.string.asteroid_api_error_message, Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.root, R.string.asteroid_api_error_message, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.action_refresh_data) {
                         viewModel.refreshData()
                     }
@@ -73,12 +73,11 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        viewModel.setFilteredView(
-            when(item.itemId) {
-                R.id.show_today_menu -> MainViewModel.FILTERED_VIEW_TODAY
-                else -> MainViewModel.FILTERED_VIEW_ALL
-            }
-        )
+        when(item.itemId) {
+            R.id.show_today_menu -> viewModel.setFilteredView(MainViewModel.FILTERED_VIEW_TODAY)
+            R.id.show_all_menu -> viewModel.setFilteredView(MainViewModel.FILTERED_VIEW_ALL)
+            else -> viewModel.refreshData()
+        }
         return true
     }
 }

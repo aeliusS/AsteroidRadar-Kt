@@ -6,7 +6,6 @@ import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
-//TODO: Make unit tests
 @Dao
 interface AsteroidDao {
     // if returning a basic List, room library will block on the main thread

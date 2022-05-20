@@ -70,6 +70,7 @@ fun bindImage(imageView: ImageView, imageUrl: String?, isImage: Boolean?) {
         Picasso.get()
             .load(imageUrl)
             .fit()
+            .stableKey("NasaImageOfTheDay")
             .placeholder(R.drawable.loading_animation)
             .error(R.drawable.placeholder_picture_of_day)
             .into(imageView)

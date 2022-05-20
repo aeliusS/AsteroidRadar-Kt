@@ -7,6 +7,9 @@
     <item
         android:id="@+id/show_today_menu"
         android:title="@string/today_asteroids" />
+    <item
+        android:id="@+id/refresh_data"
+        android:title="@string/menu_refresh_data" />
 <!--    <item-->
 <!--        android:id="@+id/show_saved_menu"-->
 <!--        android:title="@string/saved_asteroids" />-->
