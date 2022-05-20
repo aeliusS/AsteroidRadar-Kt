@@ -1,15 +1,13 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Bundle
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.database.DatabaseAsteroid
 import com.udacity.asteroidradar.database.asDomainModel
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.repository.AsteroidsRepository
+import com.udacity.asteroidradar.util.getMetaData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -88,16 +86,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Timber.w("Timber. Error getting picture of day")
             }
         }
-    }
-
-    /**
-     * Helper function necessary to get API key
-     * */
-    private fun getMetaData(context: Context): Bundle? {
-        return context.packageManager.getApplicationInfo(
-            context.packageName,
-            PackageManager.GET_META_DATA
-        ).metaData
     }
 
     fun finishedDisplayingApiErrorMessage() {
