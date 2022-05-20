@@ -5,8 +5,14 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.lifecycle.*
+import com.udacity.asteroidradar.database.DatabaseAsteroid
+import com.udacity.asteroidradar.database.asDomainModel
 import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.repository.AsteroidsRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
@@ -16,8 +22,13 @@ enum class AsteroidApiStatus { LOADING, ERROR, DONE }
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object {
+        const val FILTERED_VIEW_ALL = -1
+        const val FILTERED_VIEW_TODAY = 0
+    }
+
     private val database = getDatabase(application)
-    private val asteroidsRepository = AsteroidsRepository(database)
+    private val asteroidsRepository = AsteroidsRepository(database.asteroidDao)
 
     private var metadata = getMetaData(application.applicationContext)
     private val apiKey: String = metadata?.get("nasa_api_key").toString() // the api key
@@ -32,7 +43,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         getPictureOfDay()
     }
 
-    val asteroids = asteroidsRepository.asteroids
+    private val filteredView: MutableStateFlow<Int> = MutableStateFlow(FILTERED_VIEW_ALL)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _asteroids: LiveData<List<DatabaseAsteroid>> = filteredView.flatMapLatest { filter ->
+        if(filter == FILTERED_VIEW_ALL) {
+            asteroidsRepository.getAsteroidsAll()
+        } else {
+            asteroidsRepository.getAsteroidsForToday()
+        }
+    }.asLiveData()
+
+    val asteroids: LiveData<List<Asteroid>> =
+        Transformations.map(_asteroids) {
+            it.asDomainModel()
+        }
 
     val pictureOfDay = asteroidsRepository.pictureOfDay
 
@@ -77,6 +102,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun finishedDisplayingApiErrorMessage() {
         _asteroidApiStatus.value = AsteroidApiStatus.DONE
+    }
+
+    fun setFilteredView(filter: Int) {
+        filteredView.value = filter
     }
 
     /**

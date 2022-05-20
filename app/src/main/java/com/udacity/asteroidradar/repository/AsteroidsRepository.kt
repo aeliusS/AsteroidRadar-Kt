@@ -7,9 +7,8 @@ import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.AsteroidApi
 import com.udacity.asteroidradar.api.asDatabaseModel
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
-import com.udacity.asteroidradar.database.AsteroidsDatabase
+import com.udacity.asteroidradar.database.AsteroidDao
 import com.udacity.asteroidradar.database.asDomainModel
-import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.domain.PictureOfDay
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -20,18 +19,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class AsteroidsRepository(
-    private val database: AsteroidsDatabase,
+    private val asteroidDao: AsteroidDao,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-    // the live data will only execute when a fragment is listening so it is safe to add this
-    // as a property
-    val asteroids: LiveData<List<Asteroid>> =
-        Transformations.map(database.asteroidDao.getAsteroids()) {
-            it.asDomainModel()
-        }
+
+    private val calendar = Calendar.getInstance()
+    private var todayDate = formatDate(calendar)
+
+    fun getAsteroidsAll() = asteroidDao.getAsteroidsAll(todayDate)
+
+    fun getAsteroidsForToday() = asteroidDao.getAsteroidsByDate(todayDate)
 
     val pictureOfDay: LiveData<PictureOfDay?> =
-        Transformations.map(database.asteroidDao.getPictureOfDay()) {
+        Transformations.map(asteroidDao.getPictureOfDay()) {
             it?.asDomainModel()
         }
 
@@ -39,7 +39,7 @@ class AsteroidsRepository(
      * Update the database (cache) for asteroids
      * */
     suspend fun refreshAsteroids(apiKey: String) {
-        removeOldAsteroids()
+        // removeOldAsteroids()
         withContext(defaultDispatcher) {
             val (startDate, endDate) = getDateRangeFormatted()
             Timber.i("Timber. Date range is $startDate to $endDate")
@@ -47,7 +47,7 @@ class AsteroidsRepository(
             val apiResult = AsteroidApi.asteroids.getAsteroids(startDate, endDate, apiKey)
 
             val asteroids = parseAsteroidsJsonResult(JSONObject(apiResult))
-            database.asteroidDao.insertAll(*asteroids.asDatabaseModel())
+            asteroidDao.insertAll(*asteroids.asDatabaseModel())
         }
     }
 
@@ -55,12 +55,8 @@ class AsteroidsRepository(
      * Remove asteroids that already passed
      * */
     private suspend fun removeOldAsteroids() {
-        // get current date
-        val calendar = Calendar.getInstance()
-        val targetDate = formatDate(calendar)
-
         withContext(defaultDispatcher) {
-            database.asteroidDao.deleteOldAsteroids(targetDate)
+            asteroidDao.deleteOldAsteroids(todayDate)
         }
     }
 
@@ -70,8 +66,8 @@ class AsteroidsRepository(
     suspend fun refreshPictureOfDay(apiKey: String) {
         withContext(defaultDispatcher) {
             val networkPictureOfDay = AsteroidApi.asteroids.getPictureOfTheDay(apiKey)
-            database.asteroidDao.clearPictureOfDay()
-            database.asteroidDao.insertPictureOfDay(networkPictureOfDay.asDatabaseModel())
+            asteroidDao.clearPictureOfDay()
+            asteroidDao.insertPictureOfDay(networkPictureOfDay.asDatabaseModel())
         }
     }
 
@@ -81,7 +77,7 @@ class AsteroidsRepository(
     private fun getDateRangeFormatted(): DateRange {
         val calendar = Calendar.getInstance()
         return DateRange(
-            startDate = formatDate(calendar),
+            startDate = todayDate,
             endDate = formatDate(calendar, Constants.DEFAULT_END_DATE_DAYS)
         )
     }

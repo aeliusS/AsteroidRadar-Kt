@@ -73,6 +73,12 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewModel.setFilteredView(
+            when(item.itemId) {
+                R.id.show_today_menu -> MainViewModel.FILTERED_VIEW_TODAY
+                else -> MainViewModel.FILTERED_VIEW_ALL
+            }
+        )
         return true
     }
 }

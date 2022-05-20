@@ -3,6 +3,7 @@ package com.udacity.asteroidradar.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 //TODO: Make unit tests
@@ -10,8 +11,12 @@ import timber.log.Timber
 interface AsteroidDao {
     // if returning a basic List, room library will block on the main thread
     // if using live data, the UI can watch for changes and room will update on a background thread
-    @Query("SELECT * FROM DatabaseAsteroid ORDER BY closeApproachDate")
-    fun getAsteroids(): LiveData<List<DatabaseAsteroid>>
+    @Query("SELECT * FROM DatabaseAsteroid " +
+            "WHERE closeApproachDate >= :targetDate ORDER BY closeApproachDate")
+    fun getAsteroidsAll(targetDate: String): Flow<List<DatabaseAsteroid>>
+
+    @Query("SELECT * FROM DatabaseAsteroid WHERE closeApproachDate = :targetDate")
+    fun getAsteroidsByDate(targetDate: String): Flow<List<DatabaseAsteroid>>
 
     // vararg allows us to pass a variable number of DatabaseVideo objects to be
     // insert/updated by the room library
