@@ -37,8 +37,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         get() = _asteroidApiStatus
 
     init {
-        getAsteroids()
-        getPictureOfDay()
+        refreshData()
     }
 
     private val filteredView: MutableStateFlow<Int> = MutableStateFlow(FILTERED_VIEW_ALL)
@@ -60,30 +59,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay = asteroidsRepository.pictureOfDay
 
     fun refreshData() {
-        getAsteroids()
+        updateAsteroidsAndPictureOfDay()
     }
 
-    private fun getAsteroids() {
+    private fun updateAsteroidsAndPictureOfDay() {
         viewModelScope.launch {
             _asteroidApiStatus.value = AsteroidApiStatus.LOADING
             try {
                 asteroidsRepository.refreshAsteroids(apiKey)
-                _asteroidApiStatus.value = AsteroidApiStatus.DONE
                 Timber.d("Timber. Refreshed cache")
+
+                asteroidsRepository.refreshPictureOfDay(apiKey)
+                Timber.d("Timber. Updated picture")
+
+                _asteroidApiStatus.value = AsteroidApiStatus.DONE
             } catch (e: Exception) {
                 _asteroidApiStatus.value = AsteroidApiStatus.ERROR
                 Timber.w("Timber. Error with refreshing cache: $e")
-            }
-        }
-    }
-
-    private fun getPictureOfDay() {
-        viewModelScope.launch {
-            try {
-                asteroidsRepository.refreshPictureOfDay(apiKey)
-                Timber.d("Timber. Updated picture")
-            } catch (e: Exception) {
-                Timber.w("Timber. Error getting picture of day")
             }
         }
     }
