@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.util
+package com.udacity.asteroidradar.adapters
 
 import android.view.View
 import android.widget.ImageView
@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.domain.Asteroid
-import com.udacity.asteroidradar.main.AsteroidListAdapter
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
     val context = imageView.context
     if (isHazardous) {
         imageView.setImageResource(R.drawable.ic_status_potentially_hazardous)
-        imageView.contentDescription = context.getString(R.string.potentially_hazardous_asteroid_icon)
+        imageView.contentDescription =
+            context.getString(R.string.potentially_hazardous_asteroid_icon)
     } else {
         imageView.setImageResource(R.drawable.ic_status_normal)
         imageView.contentDescription = context.getString(R.string.not_hazardous_asteroid_icon)
@@ -71,15 +71,13 @@ fun goneIfNotNull(view: View, data: List<Asteroid>?) {
 }
 
 /** Adapter used to display images from URL using Picasso **/
-@BindingAdapter("imageUrl", "isImage")
-fun bindImage(imageView: ImageView, imageUrl: String?, isImage: Boolean?) {
-    if (isImage == true) {
-        Picasso.get()
-            .load(imageUrl)
-            .fit()
-            .stableKey("NasaImageOfTheDay")
-            .placeholder(R.drawable.loading_animation)
-            .error(R.drawable.placeholder_picture_of_day)
-            .into(imageView)
-    }
+@BindingAdapter("imageUrl", "isImage", "thumbUrl")
+fun bindImage(imageView: ImageView, imageUrl: String?, isImage: Boolean?, thumbUrl: String?) {
+    Picasso.get()
+        .load(if (isImage == true) imageUrl else thumbUrl)
+        .fit()
+        .stableKey("NasaImageOfTheDay")
+        .placeholder(R.drawable.loading_animation)
+        .error(R.drawable.placeholder_picture_of_day)
+        .into(imageView)
 }

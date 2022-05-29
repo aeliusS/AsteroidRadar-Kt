@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.database
+package com.udacity.asteroidradar.data
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -23,7 +23,8 @@ data class DatabasePicture(
     @PrimaryKey(autoGenerate = true) val pictureId: Long = 0L,
     @ColumnInfo(name = "media_type") val mediaType: String,
     val title: String,
-    val url: String
+    val url: String,
+    @ColumnInfo(name = "thumbnail_url") val thumbnailUrl: String?
 )
 
 fun List<DatabaseAsteroid>.asDomainModel(): List<Asteroid> {
@@ -45,6 +46,7 @@ fun DatabasePicture.asDomainModel(): PictureOfDay {
     return PictureOfDay(
         mediaType = mediaType,
         title = title,
-        url = url
+        url = url,
+        thumbnailUrl = thumbnailUrl
     )
 }

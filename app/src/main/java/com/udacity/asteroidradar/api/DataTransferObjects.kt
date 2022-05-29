@@ -2,8 +2,8 @@ package com.udacity.asteroidradar.api
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import com.udacity.asteroidradar.database.DatabaseAsteroid
-import com.udacity.asteroidradar.database.DatabasePicture
+import com.udacity.asteroidradar.data.DatabaseAsteroid
+import com.udacity.asteroidradar.data.DatabasePicture
 
 data class NetworkAsteroid(
     val id: Long, val codename: String, val closeApproachDate: String,
@@ -15,8 +15,12 @@ data class NetworkAsteroid(
 data class NetworkAsteroidContainer(val asteroids: ArrayList<NetworkAsteroid>)
 
 @JsonClass(generateAdapter = true)
-data class NetworkPictureOfDay(@Json(name = "media_type") val mediaType: String, val title: String,
-                        val url: String)
+data class NetworkPictureOfDay(
+    @Json(name = "media_type") val mediaType: String,
+    val title: String,
+    val url: String,
+    @Json(name = "thumbnail_url") val thumbnailUrl: String?
+)
 
 
 /**
@@ -41,6 +45,7 @@ fun NetworkPictureOfDay.asDatabaseModel(): DatabasePicture {
     return DatabasePicture(
         mediaType = mediaType,
         title = title,
-        url = url
+        url = url,
+        thumbnailUrl = thumbnailUrl
     )
 }

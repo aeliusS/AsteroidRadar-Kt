@@ -1,7 +1,8 @@
-package com.udacity.asteroidradar.api
+package com.udacity.asteroidradar.utilities
 
 import android.os.Build
-import com.udacity.asteroidradar.util.Constants
+import com.udacity.asteroidradar.api.NetworkAsteroid
+import com.udacity.asteroidradar.api.NetworkAsteroidContainer
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*

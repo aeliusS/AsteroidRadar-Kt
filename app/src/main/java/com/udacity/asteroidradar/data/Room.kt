@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.database
+package com.udacity.asteroidradar.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -44,7 +44,7 @@ interface AsteroidDao {
 
 @Database(
     entities = [DatabaseAsteroid::class, DatabasePicture::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class AsteroidsDatabase : RoomDatabase() {

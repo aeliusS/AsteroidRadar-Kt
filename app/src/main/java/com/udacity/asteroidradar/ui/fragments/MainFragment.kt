@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.main
+package com.udacity.asteroidradar.ui.fragments
 
 import android.os.Bundle
 import android.view.*
@@ -7,7 +7,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
+import com.udacity.asteroidradar.adapters.AsteroidClickListener
+import com.udacity.asteroidradar.adapters.AsteroidListAdapter
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
+import com.udacity.asteroidradar.viewmodels.AsteroidApiStatus
+import com.udacity.asteroidradar.viewmodels.MainViewModel
 
 class MainFragment : Fragment() {
 

@@ -1,13 +1,13 @@
-package com.udacity.asteroidradar.main
+package com.udacity.asteroidradar.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.database.DatabaseAsteroid
-import com.udacity.asteroidradar.database.asDomainModel
-import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.data.DatabaseAsteroid
+import com.udacity.asteroidradar.data.asDomainModel
+import com.udacity.asteroidradar.data.getDatabase
 import com.udacity.asteroidradar.domain.Asteroid
-import com.udacity.asteroidradar.repository.AsteroidsRepository
-import com.udacity.asteroidradar.util.getMetaData
+import com.udacity.asteroidradar.data.AsteroidsRepository
+import com.udacity.asteroidradar.utilities.getMetaData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest

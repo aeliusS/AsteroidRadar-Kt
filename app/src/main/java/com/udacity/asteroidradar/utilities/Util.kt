@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.util
+package com.udacity.asteroidradar.utilities
 
 import android.content.Context
 import android.content.pm.PackageManager

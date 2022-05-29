@@ -1,11 +1,11 @@
-package com.udacity.asteroidradar.work
+package com.udacity.asteroidradar.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.udacity.asteroidradar.database.getDatabase
-import com.udacity.asteroidradar.repository.AsteroidsRepository
-import com.udacity.asteroidradar.util.getMetaData
+import com.udacity.asteroidradar.data.getDatabase
+import com.udacity.asteroidradar.data.AsteroidsRepository
+import com.udacity.asteroidradar.utilities.getMetaData
 import java.lang.Exception
 
 class RefreshDataWork(appContext: Context, params: WorkerParameters): CoroutineWorker(appContext, params) {

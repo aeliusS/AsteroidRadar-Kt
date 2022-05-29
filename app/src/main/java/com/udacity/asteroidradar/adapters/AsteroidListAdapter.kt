@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.main
+package com.udacity.asteroidradar.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.udacity.asteroidradar.databinding.ListAsteroidBinding
 import com.udacity.asteroidradar.domain.Asteroid
-import com.udacity.asteroidradar.main.AsteroidListAdapter.AsteroidListViewHolder
+import com.udacity.asteroidradar.adapters.AsteroidListAdapter.AsteroidListViewHolder
 
-class AsteroidListAdapter(private val clickListener: AsteroidClickListener): ListAdapter<Asteroid, AsteroidListViewHolder>(DiffCallBack) {
+class AsteroidListAdapter(private val clickListener: AsteroidClickListener): ListAdapter<Asteroid, AsteroidListViewHolder>(
+    DiffCallBack
+) {
     companion object DiffCallBack: DiffUtil.ItemCallback<Asteroid>() {
         override fun areItemsTheSame(oldItem: Asteroid, newItem: Asteroid): Boolean {
             return oldItem.id == newItem.id
