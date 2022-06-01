@@ -73,11 +73,11 @@ fun goneIfNotNull(view: View, data: List<Asteroid>?) {
 /** Adapter used to display images from URL using Picasso **/
 @BindingAdapter("imageUrl", "isImage", "thumbUrl")
 fun bindImage(imageView: ImageView, imageUrl: String?, isImage: Boolean?, thumbUrl: String?) {
+    if (imageUrl.isNullOrEmpty() && thumbUrl.isNullOrEmpty()) return
     Picasso.get()
         .load(if (isImage == true) imageUrl else thumbUrl)
         .fit()
-        .stableKey("NasaImageOfTheDay")
         .placeholder(R.drawable.loading_animation)
-        .error(R.drawable.placeholder_picture_of_day)
+        .error(R.drawable.ic_broken_image)
         .into(imageView)
 }

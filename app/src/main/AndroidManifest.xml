@@ -18,7 +18,7 @@
             android:authorities="${applicationId}.androidx-startup"
             android:directBootAware="false"
             android:exported="false"
-            android:multiprocess="true"
+            android:multiprocess="false"
             tools:node="merge"
             tools:targetApi="n">
             <meta-data
